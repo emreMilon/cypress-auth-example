@@ -1,8 +1,10 @@
 /// <reference types="Cypress" />
 
-describe("My Register Test Suite", function () {
+import { IRegisterData, IResponseRegister } from "../../support/interfaces";
+
+describe("My Register Test Suite", () => {
   beforeEach(function () {
-    cy.fixture("register.json").then((data) => {
+    cy.fixture("register.json").then((data: IRegisterData) => {
       this.data = data;
     });
   });
@@ -15,7 +17,7 @@ describe("My Register Test Suite", function () {
       position: this.data.position,
       email: this.data.email,
       password: this.data.password,
-    }).then(function (response) {
+    }).then((response: IResponseRegister) => {
       expect(response.body).to.have.property(
         "message",
         "Please active your account"
@@ -23,7 +25,6 @@ describe("My Register Test Suite", function () {
       expect(response.body).to.have.property("activeToken");
     });
   });
-
   it("Register test case in frontend", function () {
     cy.visit(Cypress.env("url_Frontend") + "register");
     cy.get("#userId").type(this.data.userId);
@@ -45,9 +46,10 @@ describe("My Register Test Suite", function () {
 
   it("Direct to login Page", () => {
     cy.visit(Cypress.env("url_Frontend") + "register");
-    cy.get('.col-6').click().then(() => {
-        cy.get(".text-uppercase").should("have.text", "Login")
-    })
-
-  })
+    cy.get(".col-6")
+      .click()
+      .then(() => {
+        cy.get(".text-uppercase").should("have.text", "Login");
+      });
+  });
 });

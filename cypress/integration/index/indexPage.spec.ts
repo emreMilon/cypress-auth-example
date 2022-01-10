@@ -1,13 +1,20 @@
 /// <reference types="Cypress" />
 
-describe("My Index Page Test Suite", function () {
-  let token;
-  let customerDataofFirstElementZipCode;
-  let customerDataofLength;
-  let user;
+import {
+  ILoginData,
+  IUserData,
+  IResponseLogin,
+  IResponseCustomer,
+} from "../../support/interfaces";
 
-  this.beforeEach(function () {
-    cy.fixture("login.json").then((data) => {
+describe("My Index Page Test Suite", () => {
+  let token: string;
+  let user: IUserData;
+  let customerDataofLength: number;
+  let customerDataofFirstElementZipCode: number;
+
+  beforeEach(function () {
+    cy.fixture("login.json").then((data: ILoginData) => {
       this.data = data;
     });
   });
@@ -17,7 +24,7 @@ describe("My Index Page Test Suite", function () {
       email: this.data.email,
       password: this.data.password,
     })
-      .then(function (response) {
+      .then(function (response: IResponseLogin) {
         expect(response.body).to.have.property(
           "message",
           "Login Successfully completed"
@@ -30,13 +37,12 @@ describe("My Index Page Test Suite", function () {
         cy.log("customers get api test");
         const options = {
           method: "GET",
-          url: "http://localhost:5000/api/customers",
+          url: `${Cypress.env("url_Backend")}customers`,
           headers: {
             tokenn: token,
           },
         };
-
-        cy.request(options).then(function (response) {
+        cy.request(options).then(function (response: IResponseCustomer) {
           expect(response.body).to.have.property(
             "message",
             "All customers found"
@@ -46,8 +52,8 @@ describe("My Index Page Test Suite", function () {
         });
       })
       .then(() => {
-          cy.log("Customer / Index page test case")
-        let zipCode;
+        cy.log("Customer / Index page test case");
+        let zipCode: string;
         cy.visit(Cypress.env("url_Frontend") + "login");
         cy.get("#email").type(this.data.email);
         cy.get("#password").type(this.data.password);
@@ -71,9 +77,8 @@ describe("My Index Page Test Suite", function () {
         } else if (user.position === "Leiter") {
           navBarLink.should("have.text", "Users");
         }
-    
+
         cy.get("li.nav-link").should("have.text", user.lastName);
-    
         //logout
         cy.get(":nth-child(2) > :nth-child(1) > .nav-link")
           .click()
@@ -84,6 +89,6 @@ describe("My Index Page Test Suite", function () {
               expect(indexText.text().includes("CRM FORECAST")).to.be.true;
             });
           });
-      })
+      });
   });
 });

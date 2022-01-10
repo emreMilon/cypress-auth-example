@@ -1,25 +1,33 @@
 /// <reference types="Cypress" />
 
-describe("My Forecasts Page Test Suite", function () {
-  let token;
-  let user;
-  let priceOfFirstForecast;
-  let forecastDataofLength;
-  let forecasts;
-  let users;
+import {
+  IResponseLogin,
+  ILoginData,
+  IUserData,
+  IResponseForecast,
+  IForecastData,
+  IUserResponse,
+} from "../../support/interfaces";
 
-  this.beforeEach(function () {
-    cy.fixture("login.json").then((data) => {
+describe("My Forecasts Page Test Suite", function () {
+  let token: string;
+  let user: IUserData;
+  let priceOfFirstForecast: number;
+  let forecastDataofLength: number;
+  let forecasts: IForecastData[];
+  let users: IUserData[];
+
+  beforeEach(function () {
+    cy.fixture("login.json").then((data: ILoginData) => {
       this.data = data;
     });
   });
-
   it("after login forecasts page test case", function () {
     cy.request("POST", Cypress.env("url_Backend") + "login", {
       email: this.data.email,
       password: this.data.password,
     })
-      .then(function (response) {
+      .then(function (response: IResponseLogin) {
         expect(response.body).to.have.property(
           "message",
           "Login Successfully completed"
@@ -32,19 +40,19 @@ describe("My Forecasts Page Test Suite", function () {
         cy.log("forecasts get api test");
         const options = {
           method: "GET",
-          url: "http://localhost:5000/api/forecasts",
+          url: `${Cypress.env("url_Backend")}forecasts`,
           headers: {
             tokenn: token,
           },
         };
-
-        cy.request(options).then(function (response) {
+        cy.request(options).then((response: IResponseForecast) => {
           expect(response.body).to.have.property(
             "message",
             "All forecasts found"
           );
+          forecasts = response.body["data"];
           priceOfFirstForecast = response.body["data"][0].price;
-          cy.log(priceOfFirstForecast);
+          cy.log(`${priceOfFirstForecast}`);
           forecastDataofLength = response.body["data"].length;
           cy.log("length", forecastDataofLength);
         });
@@ -60,14 +68,6 @@ describe("My Forecasts Page Test Suite", function () {
           },
         };
 
-        const optionsForecast = {
-          method: "GET",
-          url: Cypress.env("url_Backend") + "forecasts",
-          headers: {
-            tokenn: token,
-          },
-        };
-
         cy.visit(Cypress.env("url_Frontend") + "login");
         cy.get("#email").type(this.data.email);
         cy.get("#password").type(this.data.password);
@@ -76,7 +76,7 @@ describe("My Forecasts Page Test Suite", function () {
           cy.contains("Users").click();
           cy.log("Get Users Get Api Backend Test");
 
-          cy.request(optionsUsers).then(function (response) {
+          cy.request(optionsUsers).then(function (response: IUserResponse) {
             expect(response.body).to.have.property(
               "message",
               "All users found"
@@ -91,38 +91,25 @@ describe("My Forecasts Page Test Suite", function () {
               }
             );
 
-            cy.request(optionsForecast).then((response) => {
-                expect(response.body).to.have.property(
-                  "message",
-                  "All forecasts found"
-                );
-    
-                forecasts = response.body["data"].filter(
-                  (forecast) => forecast.userId === users[0].userId
-                );
-              });
+            forecasts = forecasts.filter(
+              (forecast) => forecast.userId === users[0].userId
+            );
 
             cy.get(".container > :nth-child(2)").then(() => {
               cy.get(":nth-child(1) > .card > .card-header").click();
 
               cy.get(".card-header").then((string) => {
-                let price = string.text().split("&&");
+                let price: string[] = string.text().split("&&");
                 expect(price[1].includes(`${forecasts[0].price}`)).to.be.true;
               });
             });
           });
         } else {
           cy.contains("Forecasts").click();
-          cy.request(optionsForecast).then((response) => {
-            expect(response.body).to.have.property(
-              "message",
-              "All forecasts found"
-            );
+          forecasts = forecasts.filter(
+            (forecast) => forecast.userId === user.userId
+          );
 
-            forecasts = response.body["data"].filter(
-              (forecast) => forecast.userId === user.userId
-            );
-          });
           cy.get(":nth-child(1) > .card-header").then((string) => {
             let price = string.text().split("&&");
             expect(price[1].includes(`${forecasts[0].price}`)).to.be.true;
