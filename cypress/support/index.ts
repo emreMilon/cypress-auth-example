@@ -14,7 +14,15 @@
 // ***********************************************************
 
 // Import commands.ts using ES2015 syntax:
-import './commands'
+import {fillForm} from './commands/fillForm'
+import {checkPostApiMessage} from './commands/checkPostApiMessage'
+import {checkPrice} from './commands/checkPrice'
+import {clickElement} from './commands/clickElement'
 
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+Cypress.Commands.add('fillForm', fillForm)
+Cypress.Commands.add('checkPostApiMessage', checkPostApiMessage)
+Cypress.Commands.add('checkPrice', checkPrice)
+Cypress.Commands.add('clickElement', clickElement)
+
+
+

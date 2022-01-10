@@ -22,14 +22,15 @@ describe("My Login Test Suite", () => {
           "message",
           "Login Successfully completed"
         );
+        cy.checkPostApiMessage(response.body, "Login Successfully completed")
         userData = response.body["user"];
       })
       .then(function () {
         cy.log("Frontend part");
 
         cy.visit(Cypress.env("url_Frontend") + "login");
-        cy.get("#email").type(this.data.email);
-        cy.get("#password").type(this.data.password);
+        cy.fillForm("email", this.data.email)
+        cy.fillForm("password", this.data.password)
         cy.get(".btn").click();
         cy.get("li.nav-link").should("have.text", userData.lastName);
         cy.get(".container").find(".customerCard");

@@ -25,10 +25,8 @@ describe("My Index Page Test Suite", () => {
       password: this.data.password,
     })
       .then(function (response: IResponseLogin) {
-        expect(response.body).to.have.property(
-          "message",
-          "Login Successfully completed"
-        );
+        cy.checkPostApiMessage(response.body, "Login Successfully completed");
+
         expect(response.body).to.have.property("user");
         token = response.body["access_token"];
         user = response.body["user"];
@@ -43,10 +41,8 @@ describe("My Index Page Test Suite", () => {
           },
         };
         cy.request(options).then(function (response: IResponseCustomer) {
-          expect(response.body).to.have.property(
-            "message",
-            "All customers found"
-          );
+          cy.checkPostApiMessage(response.body, "All customers found");
+
           customerDataofFirstElementZipCode = response.body["data"][0].zip;
           customerDataofLength = response.body["data"].length;
         });
@@ -55,9 +51,9 @@ describe("My Index Page Test Suite", () => {
         cy.log("Customer / Index page test case");
         let zipCode: string;
         cy.visit(Cypress.env("url_Frontend") + "login");
-        cy.get("#email").type(this.data.email);
-        cy.get("#password").type(this.data.password);
-        cy.get(".btn").click();
+        cy.fillForm("email", this.data.email);
+        cy.fillForm("password", this.data.password);
+        cy.clickElement(".btn");
         cy.get(".customerCard")
           .find(".card")
           .its("length")
@@ -80,15 +76,15 @@ describe("My Index Page Test Suite", () => {
 
         cy.get("li.nav-link").should("have.text", user.lastName);
         //logout
-        cy.get(":nth-child(2) > :nth-child(1) > .nav-link")
-          .click()
-          .then(() => {
+        cy.clickElement(":nth-child(2) > :nth-child(1) > .nav-link").then(
+          () => {
             cy.get(".navbar-brand").should("have.text", "CRM-Forecast");
             cy.get(":nth-child(1) > .nav-link").should("have.text", "Login");
             cy.get('h2[class*="text"]').then((indexText) => {
               expect(indexText.text().includes("CRM FORECAST")).to.be.true;
             });
-          });
+          }
+        );
       });
   });
 });

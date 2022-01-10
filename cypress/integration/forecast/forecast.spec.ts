@@ -28,10 +28,8 @@ describe("My Forecasts Page Test Suite", function () {
       password: this.data.password,
     })
       .then(function (response: IResponseLogin) {
-        expect(response.body).to.have.property(
-          "message",
-          "Login Successfully completed"
-        );
+        cy.checkPostApiMessage(response.body, "Login Successfully completed");
+
         expect(response.body).to.have.property("user");
         token = response.body["access_token"];
         user = response.body["user"];
@@ -46,10 +44,8 @@ describe("My Forecasts Page Test Suite", function () {
           },
         };
         cy.request(options).then((response: IResponseForecast) => {
-          expect(response.body).to.have.property(
-            "message",
-            "All forecasts found"
-          );
+          cy.checkPostApiMessage(response.body, "All forecasts found");
+
           forecasts = response.body["data"];
           priceOfFirstForecast = response.body["data"][0].price;
           cy.log(`${priceOfFirstForecast}`);
@@ -69,18 +65,16 @@ describe("My Forecasts Page Test Suite", function () {
         };
 
         cy.visit(Cypress.env("url_Frontend") + "login");
-        cy.get("#email").type(this.data.email);
-        cy.get("#password").type(this.data.password);
-        cy.get(".btn").click();
+        cy.fillForm("email", this.data.email);
+        cy.fillForm("password", this.data.password);
+        cy.clickElement(".btn");
         if (user.position === "Leiter") {
           cy.contains("Users").click();
           cy.log("Get Users Get Api Backend Test");
 
           cy.request(optionsUsers).then(function (response: IUserResponse) {
-            expect(response.body).to.have.property(
-              "message",
-              "All users found"
-            );
+            cy.checkPostApiMessage(response.body, "All users found");
+
             users = response.body["data"].filter(
               (user) => user.position === "Vertrieber"
             );
@@ -96,12 +90,8 @@ describe("My Forecasts Page Test Suite", function () {
             );
 
             cy.get(".container > :nth-child(2)").then(() => {
-              cy.get(":nth-child(1) > .card > .card-header").click();
-
-              cy.get(".card-header").then((string) => {
-                let price: string[] = string.text().split("&&");
-                expect(price[1].includes(`${forecasts[0].price}`)).to.be.true;
-              });
+              cy.clickElement(":nth-child(1) > .card > .card-header");
+              cy.checkPrice(".card-header", forecasts[0].price);
             });
           });
         } else {
@@ -110,10 +100,7 @@ describe("My Forecasts Page Test Suite", function () {
             (forecast) => forecast.userId === user.userId
           );
 
-          cy.get(":nth-child(1) > .card-header").then((string) => {
-            let price = string.text().split("&&");
-            expect(price[1].includes(`${forecasts[0].price}`)).to.be.true;
-          });
+          cy.checkPrice(":nth-child(1) > .card-header", forecasts[0].price);
         }
       });
   });
