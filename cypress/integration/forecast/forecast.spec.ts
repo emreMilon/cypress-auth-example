@@ -2,7 +2,6 @@
 
 import {
   IResponseLogin,
-  ILoginData,
   IUserData,
   IResponseForecast,
   IForecastData,
@@ -17,16 +16,8 @@ describe("My Forecasts Page Test Suite", function () {
   let forecasts: IForecastData[];
   let users: IUserData[];
 
-  beforeEach(function () {
-    cy.fixture("login.json").then((data: ILoginData) => {
-      this.data = data;
-    });
-  });
   it("after login forecasts page test case", function () {
-    cy.request("POST", Cypress.env("url_Backend") + "login", {
-      email: this.data.email,
-      password: this.data.password,
-    })
+    cy.loginBackend("Leiter")
       .then(function (response: IResponseLogin) {
         cy.checkPostApiMessage(response.body, "Login Successfully completed");
 
@@ -64,9 +55,7 @@ describe("My Forecasts Page Test Suite", function () {
           },
         };
 
-        cy.visit(Cypress.env("url_Frontend") + "login");
-        cy.fillForm("email", this.data.email);
-        cy.fillForm("password", this.data.password);
+        cy.loginFrontend("Leiter");
         cy.clickElement(".btn");
         if (user.position === "Leiter") {
           cy.contains("Users").click();

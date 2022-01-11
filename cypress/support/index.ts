@@ -18,11 +18,16 @@ import {fillForm} from './commands/fillForm'
 import {checkPostApiMessage} from './commands/checkPostApiMessage'
 import {checkPrice} from './commands/checkPrice'
 import {clickElement} from './commands/clickElement'
+import {loginBackend, loginFrontend, logOutBackend, logOutFrontend} from './commands/login'
 
 Cypress.Commands.add('fillForm', fillForm)
 Cypress.Commands.add('checkPostApiMessage', checkPostApiMessage)
 Cypress.Commands.add('checkPrice', checkPrice)
 Cypress.Commands.add('clickElement', clickElement)
+Cypress.Commands.add('loginBackend', loginBackend)
+Cypress.Commands.add('loginFrontend', loginFrontend)
+Cypress.Commands.add('logOutFrontend', logOutFrontend)
+Cypress.Commands.add('logOutBackend', logOutBackend)
 
 
 

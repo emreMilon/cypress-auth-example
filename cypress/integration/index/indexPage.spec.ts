@@ -1,7 +1,6 @@
 /// <reference types="Cypress" />
 
 import {
-  ILoginData,
   IUserData,
   IResponseLogin,
   IResponseCustomer,
@@ -13,17 +12,8 @@ describe("My Index Page Test Suite", () => {
   let customerDataofLength: number;
   let customerDataofFirstElementZipCode: number;
 
-  beforeEach(function () {
-    cy.fixture("login.json").then((data: ILoginData) => {
-      this.data = data;
-    });
-  });
-
   it("after login customers page test case", function () {
-    cy.request("POST", Cypress.env("url_Backend") + "login", {
-      email: this.data.email,
-      password: this.data.password,
-    })
+    cy.loginBackend("Vertrieber")
       .then(function (response: IResponseLogin) {
         cy.checkPostApiMessage(response.body, "Login Successfully completed");
 
@@ -50,9 +40,7 @@ describe("My Index Page Test Suite", () => {
       .then(() => {
         cy.log("Customer / Index page test case");
         let zipCode: string;
-        cy.visit(Cypress.env("url_Frontend") + "login");
-        cy.fillForm("email", this.data.email);
-        cy.fillForm("password", this.data.password);
+        cy.loginFrontend("Vertrieber");
         cy.clickElement(".btn");
         cy.get(".customerCard")
           .find(".card")
