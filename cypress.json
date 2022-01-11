@@ -4,5 +4,8 @@
     "env": {
         "url_Frontend" : "http://localhost:3000/",
         "url_Backend" : "http://localhost:5000/api/"
+    },
+    "retries": {
+        "runMode": 1
     }
 }
