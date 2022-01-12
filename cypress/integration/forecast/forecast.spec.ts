@@ -10,20 +10,16 @@ import {
 
 describe("My Forecasts Page Test Suite", function () {
   let token: string;
-  let user: IUserData;
-  let priceOfFirstForecast: number;
-  let forecastDataofLength: number;
   let forecasts: IForecastData[];
   let users: IUserData[];
 
-  it("after login forecasts page test case", function () {
+  it("forecast Backend Api Test", function () {
     cy.loginBackend("Leiter")
       .then(function (response: IResponseLogin) {
         cy.checkPostApiMessage(response.body, "Login Successfully completed");
 
         expect(response.body).to.have.property("user");
         token = response.body["access_token"];
-        user = response.body["user"];
       })
       .then(() => {
         cy.log("forecasts get api test");
@@ -36,48 +32,53 @@ describe("My Forecasts Page Test Suite", function () {
         };
         cy.request(options).then((response: IResponseForecast) => {
           cy.checkPostApiMessage(response.body, "All forecasts found");
-
-          forecasts = response.body["data"];
-          priceOfFirstForecast = response.body["data"][0].price;
-          cy.log(`${priceOfFirstForecast}`);
-          forecastDataofLength = response.body["data"].length;
-          cy.log("length", forecastDataofLength);
         });
+      });
+  });
+
+  it("forecast and users page test", () => {
+    let resLogin: IUserData;
+    const optionsUsers = {
+      method: "GET",
+      url: Cypress.env("url_Backend") + "users",
+      headers: {
+        tokenn: token,
+      },
+    };
+
+    cy.loginFrontend("Leiter");
+    cy.clickElement(".btn");
+    cy.dbUserLogin()
+      .then((result) => {
+        resLogin = result[0];
+        return resLogin;
       })
       .then(() => {
-        cy.log("Forecast / Users page test case");
-
-        const optionsUsers = {
-          method: "GET",
-          url: Cypress.env("url_Backend") + "users",
-          headers: {
-            tokenn: token,
-          },
-        };
-
-        cy.loginFrontend("Leiter");
-        cy.clickElement(".btn");
-        if (user.position === "Leiter") {
+        if (resLogin.position === "Leiter") {
           cy.contains("Users").click();
           cy.log("Get Users Get Api Backend Test");
 
           cy.request(optionsUsers).then(function (response: IUserResponse) {
             cy.checkPostApiMessage(response.body, "All users found");
-
-            users = response.body["data"].filter(
-              (user) => user.position === "Vertrieber"
-            );
-
+            cy.task(
+              "queryDb",
+              `SELECT * FROM User WHERE Position = "Vertrieber"  `
+            ).then((result: IUserData[]) => {
+              users = [...result];
+              return users;
+            });
             cy.get(":nth-child(1) > .card > .card-body > .card-title").then(
               (userId) => {
                 expect(userId.text()).to.equal(users[0].userId);
               }
             );
 
-            forecasts = forecasts.filter(
-              (forecast) => forecast.userId === users[0].userId
-            );
-
+            cy.selectTable("Forecast").then((result: IForecastData[]) => {
+              forecasts = [...result];
+              forecasts = forecasts.filter(
+                (forecast) => forecast.userId === users[0].userId
+              );
+            });
             cy.get(".container > :nth-child(2)").then(() => {
               cy.clickElement(":nth-child(1) > .card > .card-header");
               cy.checkPrice(".card-header", forecasts[0].price);
@@ -86,7 +87,7 @@ describe("My Forecasts Page Test Suite", function () {
         } else {
           cy.contains("Forecasts").click();
           forecasts = forecasts.filter(
-            (forecast) => forecast.userId === user.userId
+            (forecast) => forecast.userId === resLogin.userId
           );
 
           cy.checkPrice(":nth-child(1) > .card-header", forecasts[0].price);

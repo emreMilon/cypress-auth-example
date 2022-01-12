@@ -4,13 +4,11 @@ import {
   IUserData,
   IResponseLogin,
   IResponseCustomer,
+  ICustomerData,
 } from "../../support/interfaces";
 
 describe("My Index Page Test Suite", () => {
   let token: string;
-  let user: IUserData;
-  let customerDataofLength: number;
-  let customerDataofFirstElementZipCode: number;
 
   it("after login customers page test case", function () {
     cy.loginBackend("Vertrieber")
@@ -19,7 +17,6 @@ describe("My Index Page Test Suite", () => {
 
         expect(response.body).to.have.property("user");
         token = response.body["access_token"];
-        user = response.body["user"];
       })
       .then(() => {
         cy.log("customers get api test");
@@ -32,47 +29,55 @@ describe("My Index Page Test Suite", () => {
         };
         cy.request(options).then(function (response: IResponseCustomer) {
           cy.checkPostApiMessage(response.body, "All customers found");
-
-          customerDataofFirstElementZipCode = response.body["data"][0].zip;
-          customerDataofLength = response.body["data"].length;
         });
+      });
+  });
+  it("Client - Index Page and Customers Component Test", () => {
+    cy.log("Customer / Index page test case");
+    let zipCode: string;
+    let resLogin: IUserData;
+    let resCustomer: ICustomerData[];
+    cy.loginFrontend("Vertrieber");
+    cy.clickElement(".btn");
+    cy.dbUserLogin().then((result) => {
+      resLogin = result[0];
+      return resLogin;
+    });
+    cy.selectTable("Customer")
+      .then((result: ICustomerData[]) => {
+        resCustomer = [...result];
+        return resCustomer;
       })
       .then(() => {
-        cy.log("Customer / Index page test case");
-        let zipCode: string;
-        cy.loginFrontend("Vertrieber");
-        cy.clickElement(".btn");
         cy.get(".customerCard")
           .find(".card")
           .its("length")
-          .should("eq", customerDataofLength);
+          .should("eq", resCustomer?.length);
         cy.get(`:nth-child(${1}) > .list-group > :nth-child(3)`)
           .then((zip) => {
             zipCode = zip.text();
           })
           .then(() => {
-            expect(Number(zipCode)).to.equal(customerDataofFirstElementZipCode);
+            expect(Number(zipCode)).to.equal(resCustomer[0]?.zip);
           });
         const navBarLink = cy.get(
           ".navbarHeader > :nth-child(1) > :nth-child(2) > .nav-link"
         );
-        if (user.position === "Vertrieber") {
+        if (resLogin?.position === "Vertrieber") {
           navBarLink.should("have.text", "Forecasts");
-        } else if (user.position === "Leiter") {
+        } else if (resLogin?.position === "Leiter") {
           navBarLink.should("have.text", "Users");
         }
 
-        cy.get("li.nav-link").should("have.text", user.lastName);
-        //logout
-        cy.clickElement(":nth-child(2) > :nth-child(1) > .nav-link").then(
-          () => {
-            cy.get(".navbar-brand").should("have.text", "CRM-Forecast");
-            cy.get(":nth-child(1) > .nav-link").should("have.text", "Login");
-            cy.get('h2[class*="text"]').then((indexText) => {
-              expect(indexText.text().includes("CRM FORECAST")).to.be.true;
-            });
-          }
-        );
+        cy.get("li.nav-link").should("have.text", resLogin?.lastName);
       });
+    //logout
+    cy.clickElement(":nth-child(2) > :nth-child(1) > .nav-link").then(() => {
+      cy.get(".navbar-brand").should("have.text", "CRM-Forecast");
+      cy.get(":nth-child(1) > .nav-link").should("have.text", "Login");
+      cy.get('h2[class*="text"]').then((indexText) => {
+        expect(indexText.text().includes("CRM FORECAST")).to.be.true;
+      });
+    });
   });
 });
