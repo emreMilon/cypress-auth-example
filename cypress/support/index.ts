@@ -19,7 +19,7 @@ import {checkPostApiMessage} from './commands/checkPostApiMessage'
 import {checkPrice} from './commands/checkPrice'
 import {clickElement} from './commands/clickElement'
 import {loginBackend, loginFrontend, logOutBackend,dbUserLogin, logOutFrontend} from './commands/login'
-import { selectTable } from './commands/dbConnect'
+import { selectTable, selectUser } from './commands/dbConnect'
 
 Cypress.Commands.add('fillForm', fillForm)
 Cypress.Commands.add('checkPostApiMessage', checkPostApiMessage)
@@ -31,6 +31,7 @@ Cypress.Commands.add('logOutFrontend', logOutFrontend)
 Cypress.Commands.add('logOutBackend', logOutBackend)
 Cypress.Commands.add('dbUserLogin', dbUserLogin)
 Cypress.Commands.add('selectTable', selectTable)
+Cypress.Commands.add('selectUser', selectUser)
 
 
 

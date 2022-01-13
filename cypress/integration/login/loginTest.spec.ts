@@ -1,16 +1,8 @@
 /// <reference types="Cypress" />
 
-import { IResponseLogin, IUserData } from "../../support/interfaces";
+import { IUserData } from "../../support/interfaces";
 
 describe("My Login Test Suite", () => {
-  it("login test Backend", function () {
-    cy.log("Backend Part");
-    cy.loginBackend("Leiter").then(function (response: IResponseLogin) {
-      cy.checkPostApiMessage(response.body, "Login Successfully completed");
-    });
-    cy.logOutBackend();
-  });
-
   it("login test frontend", function () {
     let res: IUserData;
     cy.log("Frontend part");

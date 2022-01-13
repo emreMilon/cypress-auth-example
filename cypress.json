@@ -10,8 +10,6 @@
             "password": "Dsvgh6083..",
             "database": "Users"
         }
-    },
-    "retries": {
-        "runMode": 1
     }
+    
 }

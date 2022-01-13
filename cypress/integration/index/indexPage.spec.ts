@@ -2,36 +2,10 @@
 
 import {
   IUserData,
-  IResponseLogin,
-  IResponseCustomer,
   ICustomerData,
 } from "../../support/interfaces";
 
 describe("My Index Page Test Suite", () => {
-  let token: string;
-
-  it("after login customers page test case", function () {
-    cy.loginBackend("Vertrieber")
-      .then(function (response: IResponseLogin) {
-        cy.checkPostApiMessage(response.body, "Login Successfully completed");
-
-        expect(response.body).to.have.property("user");
-        token = response.body["access_token"];
-      })
-      .then(() => {
-        cy.log("customers get api test");
-        const options = {
-          method: "GET",
-          url: `${Cypress.env("url_Backend")}customers`,
-          headers: {
-            tokenn: token,
-          },
-        };
-        cy.request(options).then(function (response: IResponseCustomer) {
-          cy.checkPostApiMessage(response.body, "All customers found");
-        });
-      });
-  });
   it("Client - Index Page and Customers Component Test", () => {
     cy.log("Customer / Index page test case");
     let zipCode: string;

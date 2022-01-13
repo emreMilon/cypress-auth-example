@@ -1,9 +1,7 @@
 /// <reference types="Cypress" />
 
 import {
-  IResponseLogin,
   IUserData,
-  IResponseForecast,
   IForecastData,
   IUserResponse,
 } from "../../support/interfaces";
@@ -12,29 +10,6 @@ describe("My Forecasts Page Test Suite", function () {
   let token: string;
   let forecasts: IForecastData[];
   let users: IUserData[];
-
-  it("forecast Backend Api Test", function () {
-    cy.loginBackend("Leiter")
-      .then(function (response: IResponseLogin) {
-        cy.checkPostApiMessage(response.body, "Login Successfully completed");
-
-        expect(response.body).to.have.property("user");
-        token = response.body["access_token"];
-      })
-      .then(() => {
-        cy.log("forecasts get api test");
-        const options = {
-          method: "GET",
-          url: `${Cypress.env("url_Backend")}forecasts`,
-          headers: {
-            tokenn: token,
-          },
-        };
-        cy.request(options).then((response: IResponseForecast) => {
-          cy.checkPostApiMessage(response.body, "All forecasts found");
-        });
-      });
-  });
 
   it("forecast and users page test", () => {
     let resLogin: IUserData;
