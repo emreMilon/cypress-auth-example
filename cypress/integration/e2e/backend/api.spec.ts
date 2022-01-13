@@ -52,7 +52,7 @@ describe("Backend API test suite", function () {
 
   for (let i = 0; i < 2; i++) {
     describe("It logins to api and gets the customers, forecasts and users", function () {
-      beforeEach("It logins to the api", function () {
+      before("It logins to the api", function () {
         cy.request("POST", Cypress.env("url_Backend") + "login", {
           email: loginData[i].email,
           password: loginData[i].password,
@@ -61,6 +61,26 @@ describe("Backend API test suite", function () {
           expect(response.body).to.have.property("access_token");
           this.token = response.body["access_token"];
           this.user = response.body["user"];
+        });
+      });
+
+      it("it gets users", function () {
+        const options = {
+          method: "GET",
+          url: `${Cypress.env("url_Backend")}users`,
+          headers: {
+            tokenn: this.token,
+          },
+        };
+
+        cy.request(options).then(function (response: IUserResponse) {
+          cy.checkPostApiMessage(response.body, "All users found");
+          expect(response.body).to.have.property("status", "success");
+          if (i === 0) {
+            expect(this.user?.position).equal("Leiter");
+          } else if (i === 2) {
+            expect(this.user?.position).equal("Vertrieber");
+          }
         });
       });
 
@@ -94,25 +114,7 @@ describe("Backend API test suite", function () {
         });
       });
 
-      it("it gets users", function () {
-        const options = {
-          method: "GET",
-          url: `${Cypress.env("url_Backend")}users`,
-          headers: {
-            tokenn: this.token,
-          },
-        };
-
-        cy.request(options).then(function (response: IUserResponse) {
-          cy.checkPostApiMessage(response.body, "All users found");
-          expect(response.body).to.have.property("status", "success");
-          if (i === 0) {
-            expect(this.user.position).equal("Leiter");
-          } else if (i === 2) {
-            expect(this.user.position).equal("Vertrieber");
-          }
-        });
-      });
+     
     });
   }
 
