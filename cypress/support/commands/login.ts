@@ -34,15 +34,9 @@ export const loginBackend = (position: string) => {
   });
 };
 
-export const loginFrontend = (position: string) => {
-  if (position === "Leiter") {
-    index = 0;
-  } else if (position === "Vertrieber") {
-    index = 1;
-  }
-  cy.visit(Cypress.env("url_Frontend") + "login");
-  cy.fillForm("email", loginData[index].email);
-  cy.fillForm("password", loginData[index].password);
+export const loginFrontend = (data: any) => {
+  cy.fillForm("email", data.email);
+  cy.fillForm("password", data.password);
 };
 
 export const logOutBackend = () => {
