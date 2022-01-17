@@ -20,7 +20,7 @@ import {checkPrice} from './commands/checkPrice'
 import {clickElement} from './commands/clickElement'
 import {loginBackend, loginFrontend, logOutBackend,dbUserLogin, logOutFrontend} from './commands/login'
 import { selectTable, selectUser } from './commands/dbConnect'
-
+import "./commands.ts"
 Cypress.Commands.add('fillForm', fillForm)
 Cypress.Commands.add('checkPostApiMessage', checkPostApiMessage)
 Cypress.Commands.add('checkPrice', checkPrice)
